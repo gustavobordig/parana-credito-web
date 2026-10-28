@@ -1,0 +1,486 @@
+:root {
+  --fundo: #f4f6fa;
+  --superficie: #ffffff;
+  --borda: #e2e6ee;
+  --texto: #121826;
+  --texto-suave: #5b6476;
+  --primaria: #0b5fff;
+  --primaria-hover: #0a4fd6;
+  --sucesso: #0f8a4f;
+  --sucesso-fundo: #e5f6ed;
+  --perigo: #c62f2f;
+  --perigo-fundo: #fdecec;
+  --andamento: #b26b00;
+  --raio: 14px;
+  --sombra: 0 1px 2px rgb(16 24 40 / 0.04), 0 4px 16px rgb(16 24 40 / 0.06);
+
+  color-scheme: light dark;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--texto);
+  background: var(--fundo);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0d1117;
+    --superficie: #161b24;
+    --borda: #273041;
+    --texto: #e7ebf3;
+    --texto-suave: #98a2b6;
+    --primaria: #4d8bff;
+    --primaria-hover: #6b9fff;
+    --sucesso: #3ccf87;
+    --sucesso-fundo: #12301f;
+    --perigo: #ff7a7a;
+    --perigo-fundo: #3a1717;
+    --andamento: #f0b44c;
+    --sombra: none;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--fundo);
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+code {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.85em;
+}
+
+.topo {
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borda);
+}
+
+.topo-conteudo {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 18px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+
+.marca {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--primaria);
+}
+
+.topo-subtitulo {
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+.grade {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.coluna {
+  display: grid;
+  gap: 20px;
+}
+
+@media (max-width: 860px) {
+  .grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.painel {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  padding: 20px;
+  display: grid;
+  gap: 14px;
+}
+
+.painel-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nota,
+.vazio p {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 0.88rem;
+}
+
+.formulario label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+}
+
+.linha {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .linha {
+    grid-template-columns: 1fr;
+  }
+}
+
+input {
+  width: 100%;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--texto);
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+input:focus {
+  outline: 2px solid var(--primaria);
+  outline-offset: -1px;
+}
+
+.previa {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.previa strong {
+  color: var(--texto);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.botao-primario {
+  border: none;
+  background: var(--primaria);
+  color: #fff;
+  font-weight: 600;
+  padding: 12px;
+}
+
+.botao-primario:not(:disabled):hover {
+  background: var(--primaria-hover);
+}
+
+.botao-secundario {
+  border: 1px solid var(--borda);
+  background: var(--superficie);
+  color: var(--texto);
+  font-weight: 500;
+  padding: 10px 16px;
+  white-space: nowrap;
+}
+
+.botao-link {
+  border: none;
+  background: none;
+  color: var(--primaria);
+  font-size: 0.85rem;
+  padding: 0;
+}
+
+.linha-consulta {
+  display: flex;
+  gap: 8px;
+}
+
+.linha-tempo {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.etapa {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  position: relative;
+  padding-bottom: 18px;
+}
+
+.etapa:last-child {
+  padding-bottom: 0;
+}
+
+.etapa:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 24px;
+  bottom: 2px;
+  width: 2px;
+  background: var(--borda);
+}
+
+.etapa-marcador {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--borda);
+  background: var(--superficie);
+}
+
+.etapa-ok .etapa-marcador {
+  border-color: var(--sucesso);
+  background: var(--sucesso);
+  box-shadow: inset 0 0 0 4px var(--superficie);
+}
+
+.etapa-andamento .etapa-marcador {
+  border-color: var(--andamento);
+  border-top-color: transparent;
+  animation: girar 0.9s linear infinite;
+}
+
+.etapa-erro .etapa-marcador {
+  border-color: var(--perigo);
+  background: var(--perigo);
+  box-shadow: inset 0 0 0 4px var(--superficie);
+}
+
+.etapa-ignorada .etapa-marcador {
+  border-style: dashed;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .etapa-andamento .etapa-marcador {
+    animation: none;
+  }
+}
+
+.etapa-conteudo {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.etapa-topo {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.etapa-estado {
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+}
+
+.etapa-andamento .etapa-estado {
+  color: var(--andamento);
+}
+
+.etapa-erro .etapa-estado {
+  color: var(--perigo);
+}
+
+.etapa-servico {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.etapa-detalhe {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+}
+
+.id {
+  display: block;
+  width: 100%;
+  color: var(--texto-suave);
+  overflow-wrap: anywhere;
+}
+
+.selo {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.selo-aprovada {
+  color: var(--sucesso);
+  background: var(--sucesso-fundo);
+}
+
+.selo-negada {
+  color: var(--perigo);
+  background: var(--perigo-fundo);
+}
+
+.correlacao {
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+}
+
+.alerta {
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--perigo-fundo);
+  color: var(--perigo);
+  font-size: 0.9rem;
+}
+
+.alerta ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.cartoes .nota {
+  grid-column: 1 / -1;
+}
+
+.cartao {
+  aspect-ratio: 1.586;
+  border-radius: 14px;
+  padding: 18px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #0b3fb3, #0b5fff 55%, #4d8bff);
+  box-shadow: 0 8px 20px rgb(11 63 179 / 0.25);
+}
+
+.cartao-1 {
+  background: linear-gradient(135deg, #1b1f2a, #343b4f 55%, #5a6480);
+  box-shadow: 0 8px 20px rgb(27 31 42 / 0.3);
+}
+
+.cartao-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cartao-chip {
+  width: 34px;
+  height: 26px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #f5d77a, #c9a23c);
+}
+
+.cartao-tipo {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.cartao-numero {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+}
+
+.cartao-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+
+.cartao-rodape div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cartao-rodape span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cartao-rodape small {
+  font-size: 0.65rem;
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cartao-limite {
+  text-align: right;
+}
+
+.faixas {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.faixas th,
+.faixas td {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.faixas th {
+  font-weight: 500;
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+}
+
+.faixas tr:last-child td {
+  border-bottom: none;
+}
+
+.faixa-ativa td {
+  background: color-mix(in srgb, var(--primaria) 10%, transparent);
+  font-weight: 600;
+}
