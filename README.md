@@ -25,6 +25,10 @@ Interface para **cadastrar clientes e acompanhar em tempo real** o fluxo de conc
 | **Cartões** | Emite os cartões da proposta aprovada | [parana-cartoes-api](https://github.com/gustavobordig/parana-cartoes-api) |
 | Front | Cadastro e acompanhamento do fluxo | este |
 
+![Fluxograma da solução](docs/fluxograma.svg)
+
+Versão editável: [`docs/fluxograma.drawio`](docs/fluxograma.drawio), que abre no [draw.io](https://app.diagrams.net).
+
 ## O que a tela faz
 
 - **Cadastro** com máscara de CPF e prévia do score conforme a renda digitada.
