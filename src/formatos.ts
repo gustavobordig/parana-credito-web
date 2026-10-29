@@ -5,6 +5,10 @@ export const formatarMoeda = (valor: number) => moeda.format(valor)
 
 export const formatarDataHora = (iso: string) => dataHora.format(new Date(iso))
 
+const dataHoraCurta = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+
+export const formatarDataHoraCurta = (iso: string) => dataHoraCurta.format(new Date(iso))
+
 export function mascararCpf(valor: string) {
   const d = valor.replace(/\D/g, '').slice(0, 11)
   return d

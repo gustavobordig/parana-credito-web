@@ -975,6 +975,263 @@ button:focus-visible {
   color: var(--texto-suave);
 }
 
+/* Abas */
+
+.abas {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.aba {
+  position: relative;
+  border: none;
+  background: none;
+  min-height: 48px;
+  padding: 0 14px;
+  color: var(--texto-suave);
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.aba:first-child {
+  padding-left: 0;
+}
+
+.aba:hover {
+  color: var(--azul);
+}
+
+.aba[aria-current='page'] {
+  color: var(--azul);
+}
+
+.aba[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--azul);
+}
+
+.aba:first-child[aria-current='page']::after {
+  left: 0;
+}
+
+/* Clientes cadastrados */
+
+.hero-compacto .hero-conteudo {
+  padding-top: 40px;
+  padding-bottom: 112px;
+  gap: 12px;
+}
+
+.conteudo-unico {
+  margin-top: -80px;
+  padding-bottom: 64px;
+}
+
+.login {
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.login .formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.aviso {
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--andamento-fundo);
+  color: var(--andamento);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.botao-compacto {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 0.8125rem;
+}
+
+.lista-vazia {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0;
+  color: var(--texto-suave);
+  font-size: 0.9375rem;
+}
+
+.tabela-caixa {
+  overflow-x: auto;
+  margin-inline: -28px;
+  transition: opacity 0.15s;
+}
+
+.tabela-carregando {
+  opacity: 0.55;
+}
+
+.tabela-clientes {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.tabela-clientes th,
+.tabela-clientes td {
+  text-align: left;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--borda);
+  vertical-align: middle;
+}
+
+.tabela-clientes th:first-child,
+.tabela-clientes td:first-child {
+  padding-left: 28px;
+}
+
+.tabela-clientes th:last-child,
+.tabela-clientes td:last-child {
+  padding-right: 28px;
+}
+
+.tabela-clientes th {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--texto-fraco);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--fundo);
+  white-space: nowrap;
+}
+
+.tabela-clientes tbody tr:hover {
+  background: var(--azul-claro);
+}
+
+.tabela-clientes .numero {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tabela-clientes td.mono {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.celula-nome {
+  font-weight: 700;
+}
+
+.celula-email {
+  color: var(--texto-medio);
+  overflow-wrap: anywhere;
+}
+
+.celula-acao {
+  text-align: right;
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.paginacao-status {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--texto-medio);
+  text-align: center;
+}
+
+/* Tabela vira lista de cartões em telas estreitas */
+
+@media (max-width: 760px) {
+  .tabela-caixa {
+    margin-inline: 0;
+    overflow: visible;
+  }
+
+  .tabela-clientes thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .tabela-clientes,
+  .tabela-clientes tbody,
+  .tabela-clientes tr,
+  .tabela-clientes td {
+    display: block;
+  }
+
+  .tabela-clientes tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tabela-clientes tr {
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  .tabela-clientes tbody tr:hover {
+    background: none;
+  }
+
+  .tabela-clientes td,
+  .tabela-clientes th:first-child,
+  .tabela-clientes td:first-child,
+  .tabela-clientes td:last-child {
+    border: none;
+    padding: 4px 0;
+  }
+
+  .tabela-clientes td[data-rotulo] {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: right;
+  }
+
+  .tabela-clientes td[data-rotulo]::before {
+    content: attr(data-rotulo);
+    flex: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--texto-fraco);
+    text-align: left;
+  }
+
+  .tabela-clientes .celula-nome {
+    font-size: 0.9375rem;
+  }
+
+  .celula-acao {
+    padding-top: 10px !important;
+  }
+
+  .celula-acao .botao-secundario {
+    width: 100%;
+  }
+}
+
 /* Tablet: colunas empilham */
 
 @media (max-width: 900px) {
@@ -1052,8 +1309,22 @@ button:focus-visible {
     border-radius: 14px;
   }
 
-  .botao-secundario {
+  .linha-consulta .botao-secundario {
     flex: 1 1 100%;
+  }
+
+  .conteudo-unico {
+    margin-top: -72px;
+    padding-bottom: 40px;
+  }
+
+  .hero-compacto .hero-conteudo {
+    padding-top: 28px;
+    padding-bottom: 96px;
+  }
+
+  .paginacao .botao-secundario {
+    padding: 0 12px;
   }
 
   .cartoes-cabecalho {
