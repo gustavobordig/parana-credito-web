@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { gerarClienteExemplo } from '../exemplo'
 import { faixaDoScore } from '../faixas'
 import { estimarScore, formatarMoeda, mascararCpf } from '../formatos'
 import type { CadastroCliente } from '../types'
@@ -25,14 +26,7 @@ export function CadastroForm({ enviando, onEnviar }: Props) {
     onEnviar({ ...campos, rendaMensal: renda })
   }
 
-  const preencherExemplo = () =>
-    setCampos({
-      nome: 'Maria Silva',
-      cpf: gerarCpf(),
-      email: `maria.${Date.now().toString(36)}@exemplo.com`,
-      dataNascimento: '1990-05-10',
-      rendaMensal: '7500',
-    })
+  const preencherExemplo = () => setCampos(gerarClienteExemplo())
 
   const descricaoFaixa = faixa.limite
     ? `${faixa.cartoes} ${faixa.cartoes > 1 ? 'cartões' : 'cartão'} de ${formatarMoeda(faixa.limite)}`
@@ -124,16 +118,4 @@ export function CadastroForm({ enviando, onEnviar }: Props) {
       </button>
     </form>
   )
-}
-
-function gerarCpf() {
-  const base = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10))
-  const digito = (numeros: number[]) => {
-    const soma = numeros.reduce((acc, n, i) => acc + n * (numeros.length + 1 - i), 0)
-    const resto = soma % 11
-    return resto < 2 ? 0 : 11 - resto
-  }
-  base.push(digito(base))
-  base.push(digito(base))
-  return mascararCpf(base.join(''))
 }

@@ -33,7 +33,7 @@ Versão editável: [`docs/fluxograma.drawio`](docs/fluxograma.drawio), que abre 
 ## O que a tela faz
 
 - **Cadastro** com máscara de CPF e prévia do score conforme a renda digitada.
-- **Preencher exemplo:** gera um CPF válido diferente a cada clique, para testar várias vezes.
+- **Preencher exemplo:** gera um cliente diferente a cada clique: nome, e-mail, CPF válido, idade entre 18 e 70 anos e uma renda sorteada para cair em cada um dos três resultados (negado, 1 cartão ou 2 cartões).
 - **Linha do tempo** das três etapas. Proposta e cartões são gerados por eventos, de forma assíncrona; a tela consulta as APIs a cada segundo até cada etapa ficar pronta.
 - **Cartões emitidos** desenhados com número mascarado e limite.
 - **Consulta** de um cliente existente pelo id.
