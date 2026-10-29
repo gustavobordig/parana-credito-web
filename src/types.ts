@@ -37,6 +37,25 @@ export interface Cartao {
   emitidoEm: string
 }
 
+export interface Credenciais {
+  usuario: string
+  senha: string
+}
+
+export interface Token {
+  accessToken: string
+  tokenType: 'Bearer'
+  expiraEm: string
+}
+
+export interface Pagina<T> {
+  itens: T[]
+  pagina: number
+  tamanho: number
+  total: number
+  totalPaginas: number
+}
+
 export interface ProblemDetails {
   title?: string
   detail?: string

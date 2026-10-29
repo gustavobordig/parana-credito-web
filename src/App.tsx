@@ -2,6 +2,7 @@ import { Fragment, useRef, useState } from 'react'
 import { aguardar, api, ApiError } from './api'
 import { CadastroForm } from './components/CadastroForm'
 import { CartaoVisual } from './components/CartaoVisual'
+import { ClientesCadastrados } from './components/ClientesCadastrados'
 import { ConsultaCliente } from './components/ConsultaCliente'
 import { FaixasScore } from './components/FaixasScore'
 import { IconeCheck, IconeSeta, IconeX, Logo } from './components/Icones'
@@ -10,6 +11,8 @@ import { formatarDataHora, formatarMoeda } from './formatos'
 import type { CadastroCliente, Cartao, Cliente, Proposta } from './types'
 
 type NomeEtapa = 'cliente' | 'proposta' | 'cartoes'
+
+type Aba = 'fluxo' | 'clientes'
 
 interface Fluxo {
   correlationId: string
@@ -29,6 +32,7 @@ const novoFluxo = (): Fluxo => ({
 
 export default function App() {
   const [fluxo, setFluxo] = useState<Fluxo>()
+  const [aba, setAba] = useState<Aba>('fluxo')
   const controle = useRef<AbortController>(undefined)
 
   const emAndamento = fluxo !== undefined && Object.values(fluxo.estados).includes('andamento')
@@ -49,14 +53,15 @@ export default function App() {
     } catch (e) {
       if (abort.signal.aborted) return
       const erro = e instanceof ApiError ? e : new ApiError(500, { title: 'Erro inesperado.' })
-      setFluxo((atual) =>
-        atual && {
-          ...atual,
-          erro,
-          estados: Object.fromEntries(
-            Object.entries(atual.estados).map(([nome, estado]) => [nome, estado === 'andamento' ? 'erro' : estado]),
-          ) as Fluxo['estados'],
-        },
+      setFluxo(
+        (atual) =>
+          atual && {
+            ...atual,
+            erro,
+            estados: Object.fromEntries(
+              Object.entries(atual.estados).map(([nome, estado]) => [nome, estado === 'andamento' ? 'erro' : estado]),
+            ) as Fluxo['estados'],
+          },
       )
     }
   }
@@ -64,7 +69,11 @@ export default function App() {
   const acompanhar = async (cliente: Cliente, correlationId: string, sinal: AbortSignal) => {
     atualizar({ cliente }, { cliente: 'ok', proposta: 'andamento' })
 
-    const proposta = (await aguardar(() => api.obterProposta(cliente.id, correlationId), (p) => p !== null, { sinal }))!
+    const proposta = (await aguardar(
+      () => api.obterProposta(cliente.id, correlationId),
+      (p) => p !== null,
+      { sinal },
+    ))!
     if (proposta.status === 'Negada') {
       atualizar({ proposta, cartoes: [] }, { proposta: 'ok', cartoes: 'ignorada' })
       return
@@ -92,6 +101,12 @@ export default function App() {
       await acompanhar(cliente, correlationId, sinal)
     })
 
+  const acompanharDaListagem = (id: string) => {
+    setAba('fluxo')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    consultar(id)
+  }
+
   return (
     <div className="app">
       <header className="topo">
@@ -104,21 +119,57 @@ export default function App() {
           </div>
           <span className="topo-selo">Ambiente de demonstração</span>
         </div>
+        <nav className="container abas" aria-label="Seções">
+          <button
+            type="button"
+            className="aba"
+            aria-current={aba === 'fluxo' ? 'page' : undefined}
+            onClick={() => setAba('fluxo')}
+          >
+            Fluxo de crédito
+          </button>
+          <button
+            type="button"
+            className="aba"
+            aria-current={aba === 'clientes' ? 'page' : undefined}
+            onClick={() => setAba('clientes')}
+          >
+            Clientes cadastrados
+          </button>
+        </nav>
       </header>
 
-      <Hero estados={fluxo?.estados ?? ESTADOS_INICIAIS} />
+      <div hidden={aba !== 'fluxo'}>
+        <Hero estados={fluxo?.estados ?? ESTADOS_INICIAIS} />
 
-      <main className="container grade">
-        <div className="coluna coluna-esquerda">
-          <CadastroForm enviando={emAndamento} onEnviar={cadastrar} />
-          <ConsultaCliente desabilitado={emAndamento} onConsultar={consultar} />
-        </div>
+        <main className="container grade">
+          <div className="coluna coluna-esquerda">
+            <CadastroForm enviando={emAndamento} onEnviar={cadastrar} />
+            <ConsultaCliente desabilitado={emAndamento} onConsultar={consultar} />
+          </div>
 
-        <div className="coluna coluna-direita">
-          <Acompanhamento fluxo={fluxo} />
-          <FaixasScore scoreAtual={fluxo?.proposta?.score} />
+          <div className="coluna coluna-direita">
+            <Acompanhamento fluxo={fluxo} />
+            <FaixasScore scoreAtual={fluxo?.proposta?.score} />
+          </div>
+        </main>
+      </div>
+
+      {aba === 'clientes' && (
+        <div>
+          <section className="hero hero-compacto">
+            <div className="container hero-conteudo">
+              <span className="hero-sobretitulo">Moderação</span>
+              <h1>Clientes cadastrados</h1>
+              <p>Consulte os clientes já cadastrados e retome o acompanhamento da proposta e dos cartões de cada um.</p>
+            </div>
+          </section>
+
+          <main className="container conteudo-unico">
+            <ClientesCadastrados onAcompanhar={acompanharDaListagem} />
+          </main>
         </div>
-      </main>
+      )}
     </div>
   )
 }
@@ -146,7 +197,13 @@ function Hero({ estados }: { estados: Fluxo['estados'] }) {
               )}
               <li className={`hero-passo hero-passo-${estados[nome]}`}>
                 <span className="hero-passo-marcador">
-                  {estados[nome] === 'ok' ? <IconeCheck tamanho={14} /> : estados[nome] === 'erro' ? <IconeX tamanho={14} /> : i + 1}
+                  {estados[nome] === 'ok' ? (
+                    <IconeCheck tamanho={14} />
+                  ) : estados[nome] === 'erro' ? (
+                    <IconeX tamanho={14} />
+                  ) : (
+                    i + 1
+                  )}
                 </span>
                 {rotulo}
               </li>
@@ -213,7 +270,11 @@ function Acompanhamento({ fluxo }: { fluxo?: Fluxo }) {
       <div className="painel-cabecalho">
         <div className="painel-titulo">
           <h2>Acompanhamento</h2>
-          {!fluxo && <p className="nota">Cadastre um cliente para acompanhar a proposta e a emissão dos cartões em tempo real.</p>}
+          {!fluxo && (
+            <p className="nota">
+              Cadastre um cliente para acompanhar a proposta e a emissão dos cartões em tempo real.
+            </p>
+          )}
         </div>
         {fluxo && (
           <span className="correlacao" title="Enviado no header X-Correlation-Id e propagado pelos eventos">
