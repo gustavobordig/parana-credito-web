@@ -1,4 +1,4 @@
-import type { CadastroCliente, Cartao, Cliente, ProblemDetails, Proposta } from './types'
+import type { CadastroCliente, Cartao, Cliente, Credenciais, Pagina, ProblemDetails, Proposta, Token } from './types'
 
 const URLS = {
   clientes: import.meta.env.VITE_CLIENTES_API_URL ?? 'http://localhost:5101',
@@ -36,6 +36,9 @@ async function requisitar<T>(url: string, correlationId: string, init?: RequestI
   }
 
   if (resposta.status === 404) return null
+  if (resposta.status === 429) {
+    throw new ApiError(429, { title: 'Muitas tentativas. Aguarde 1 minuto.' })
+  }
   if (!resposta.ok) {
     const problema = (await resposta.json().catch(() => ({}))) as ProblemDetails
     throw new ApiError(resposta.status, problema)
@@ -58,6 +61,25 @@ export const api = {
 
   listarCartoes: async (clienteId: string, correlationId: string) =>
     (await requisitar<Cartao[]>(`${URLS.cartoes}/api/v1/cartoes/${clienteId}`, correlationId)) ?? [],
+
+  login: async (credenciais: Credenciais, correlationId: string) =>
+    (await requisitar<Token>(`${URLS.clientes}/api/v1/auth/login`, correlationId, {
+      method: 'POST',
+      body: JSON.stringify(credenciais),
+    }))!,
+
+  listarClientes: async (
+    { pagina, tamanho }: { pagina: number; tamanho: number },
+    accessToken: string,
+    correlationId: string,
+    sinal?: AbortSignal,
+  ) => {
+    const query = new URLSearchParams({ pagina: String(pagina), tamanho: String(tamanho) })
+    return (await requisitar<Pagina<Cliente>>(`${URLS.clientes}/api/v1/clientes?${query}`, correlationId, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      signal: sinal,
+    }))!
+  },
 }
 
 export async function aguardar<T>(
