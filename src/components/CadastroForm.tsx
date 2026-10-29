@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
+import { faixaDoScore } from '../faixas'
 import { estimarScore, formatarMoeda, mascararCpf } from '../formatos'
 import type { CadastroCliente } from '../types'
+import { IconeBrilho, Spinner } from './Icones'
 
 interface Props {
   enviando: boolean
@@ -13,6 +15,7 @@ export function CadastroForm({ enviando, onEnviar }: Props) {
   const [campos, setCampos] = useState(VAZIO)
   const renda = Number(campos.rendaMensal.replace(',', '.')) || 0
   const score = estimarScore(renda)
+  const faixa = faixaDoScore(score)
 
   const alterar = (campo: keyof typeof VAZIO) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setCampos((atual) => ({ ...atual, [campo]: campo === 'cpf' ? mascararCpf(e.target.value) : e.target.value }))
@@ -31,18 +34,30 @@ export function CadastroForm({ enviando, onEnviar }: Props) {
       rendaMensal: '7500',
     })
 
+  const descricaoFaixa = faixa.limite
+    ? `${faixa.cartoes} ${faixa.cartoes > 1 ? 'cartões' : 'cartão'} de ${formatarMoeda(faixa.limite)}`
+    : 'nenhum cartão'
+
   return (
-    <form className="painel formulario" onSubmit={enviar}>
+    <form className="painel painel-destaque formulario" onSubmit={enviar}>
       <div className="painel-cabecalho">
         <h2>Novo cliente</h2>
         <button type="button" className="botao-link" onClick={preencherExemplo}>
+          <IconeBrilho />
           Preencher exemplo
         </button>
       </div>
 
       <label>
         Nome completo
-        <input value={campos.nome} onChange={alterar('nome')} required maxLength={150} autoComplete="name" />
+        <input
+          value={campos.nome}
+          onChange={alterar('nome')}
+          required
+          maxLength={150}
+          autoComplete="name"
+          placeholder="Como está no documento"
+        />
       </label>
 
       <div className="linha">
@@ -58,28 +73,53 @@ export function CadastroForm({ enviando, onEnviar }: Props) {
 
       <label>
         E-mail
-        <input type="email" value={campos.email} onChange={alterar('email')} required autoComplete="email" />
-      </label>
-
-      <label>
-        Renda mensal (R$)
         <input
-          type="number"
-          min="0"
-          step="0.01"
-          value={campos.rendaMensal}
-          onChange={alterar('rendaMensal')}
+          type="email"
+          value={campos.email}
+          onChange={alterar('email')}
           required
-          inputMode="decimal"
+          autoComplete="email"
+          placeholder="nome@email.com"
         />
       </label>
 
-      <p className="previa">
-        Score estimado: <strong>{score}</strong>
-        {renda > 0 && <span> · renda de {formatarMoeda(renda)}</span>}
-      </p>
+      <label>
+        Renda mensal
+        <span className="grupo-input">
+          <span className="grupo-prefixo" aria-hidden>
+            R$
+          </span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={campos.rendaMensal}
+            onChange={alterar('rendaMensal')}
+            required
+            inputMode="decimal"
+            placeholder="0,00"
+          />
+        </span>
+      </label>
+
+      <div className="previa" aria-live="polite">
+        <div className="previa-topo">
+          <span className="previa-rotulo">Score estimado</span>
+          <span className={renda > 0 ? 'previa-valor' : 'previa-valor previa-vazia'}>
+            {renda > 0 ? score : '—'}
+            <small> / 1000</small>
+          </span>
+        </div>
+        <div className="medidor" aria-hidden>
+          <div className="medidor-preenchido" style={{ width: `${score / 10}%` }} />
+        </div>
+        <span className="previa-faixa">
+          {renda > 0 ? `Faixa ${faixa.faixa} · ${descricaoFaixa}` : 'Informe a renda para ver em qual faixa o cliente cai.'}
+        </span>
+      </div>
 
       <button type="submit" className="botao-primario" disabled={enviando}>
+        {enviando && <Spinner />}
         {enviando ? 'Processando…' : 'Solicitar crédito'}
       </button>
     </form>
