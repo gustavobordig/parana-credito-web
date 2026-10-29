@@ -422,8 +422,9 @@ button:disabled {
 
 .cartao-numero {
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 1.05rem;
-  letter-spacing: 0.12em;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
 .cartao-rodape {
