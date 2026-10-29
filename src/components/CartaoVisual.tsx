@@ -5,9 +5,10 @@ export function CartaoVisual({ cartao, titular, indice }: { cartao: Cartao; titu
   return (
     <div className={`cartao cartao-${indice % 2}`}>
       <div className="cartao-topo">
-        <span className="cartao-chip" aria-hidden />
+        <span className="cartao-marca">Paraná Banco</span>
         <span className="cartao-tipo">Crédito</span>
       </div>
+      <span className="cartao-chip" aria-hidden />
       <span className="cartao-numero">{cartao.numero}</span>
       <div className="cartao-rodape">
         <div>

@@ -13,15 +13,21 @@ export function ConsultaCliente({ onConsultar, desabilitado }: { onConsultar: (i
 
   return (
     <form className="painel consulta" onSubmit={enviar}>
-      <h2>Consultar cliente</h2>
+      <div className="painel-titulo">
+        <h2 className="titulo-secao">Consultar cliente</h2>
+        <p className="nota">Retome o acompanhamento de um cliente já cadastrado.</p>
+      </div>
       <div className="linha-consulta">
-        <input
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          placeholder="ID do cliente (GUID)"
-          aria-label="ID do cliente"
-          spellCheck={false}
-        />
+        <label className="campo-consulta">
+          <span className="sr-only">ID do cliente</span>
+          <input
+            className="mono"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            placeholder="ID do cliente (GUID)"
+            spellCheck={false}
+          />
+        </label>
         <button type="submit" className="botao-secundario" disabled={!valido || desabilitado}>
           Consultar
         </button>

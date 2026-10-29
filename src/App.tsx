@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import { aguardar, api, ApiError } from './api'
 import { CadastroForm } from './components/CadastroForm'
 import { CartaoVisual } from './components/CartaoVisual'
 import { ConsultaCliente } from './components/ConsultaCliente'
 import { FaixasScore } from './components/FaixasScore'
+import { IconeCheck, IconeSeta, IconeX, Logo } from './components/Icones'
 import { LinhaDoTempo, type EstadoEtapa, type Etapa } from './components/LinhaDoTempo'
 import { formatarDataHora, formatarMoeda } from './formatos'
 import type { CadastroCliente, Cartao, Cliente, Proposta } from './types'
@@ -18,6 +19,8 @@ interface Fluxo {
   cartoes?: Cartao[]
   erro?: ApiError
 }
+
+const ESTADOS_INICIAIS: Fluxo['estados'] = { cliente: 'pendente', proposta: 'pendente', cartoes: 'pendente' }
 
 const novoFluxo = (): Fluxo => ({
   correlationId: crypto.randomUUID(),
@@ -90,40 +93,74 @@ export default function App() {
     })
 
   return (
-    <>
+    <div className="app">
       <header className="topo">
-        <div className="topo-conteudo">
-          <span className="marca">Fluxo de Crédito</span>
-          <span className="topo-subtitulo">Cadastro → Proposta → Cartões · 3 microsserviços via RabbitMQ</span>
+        <div className="container topo-conteudo">
+          <div className="marca">
+            <Logo />
+            <span className="marca-nome">Paraná Banco</span>
+            <span className="marca-divisor" aria-hidden />
+            <span className="marca-produto">Crédito</span>
+          </div>
+          <span className="topo-selo">Ambiente de demonstração</span>
         </div>
       </header>
 
-      <main className="grade">
-        <section className="coluna">
+      <Hero estados={fluxo?.estados ?? ESTADOS_INICIAIS} />
+
+      <main className="container grade">
+        <div className="coluna coluna-esquerda">
           <CadastroForm enviando={emAndamento} onEnviar={cadastrar} />
           <ConsultaCliente desabilitado={emAndamento} onConsultar={consultar} />
-        </section>
+        </div>
 
-        <section className="coluna">
-          {fluxo ? <Resultado fluxo={fluxo} /> : <Vazio />}
+        <div className="coluna coluna-direita">
+          <Acompanhamento fluxo={fluxo} />
           <FaixasScore scoreAtual={fluxo?.proposta?.score} />
-        </section>
+        </div>
       </main>
-    </>
-  )
-}
-
-function Vazio() {
-  return (
-    <div className="painel vazio">
-      <h2>Acompanhamento</h2>
-      <p>Cadastre um cliente para acompanhar a proposta e a emissão dos cartões em tempo real.</p>
     </div>
   )
 }
 
-function Resultado({ fluxo }: { fluxo: Fluxo }) {
-  const { cliente, proposta, cartoes, erro, estados } = fluxo
+const PASSOS_HERO: { nome: NomeEtapa; rotulo: string }[] = [
+  { nome: 'cliente', rotulo: 'Cadastro' },
+  { nome: 'proposta', rotulo: 'Proposta' },
+  { nome: 'cartoes', rotulo: 'Cartões' },
+]
+
+function Hero({ estados }: { estados: Fluxo['estados'] }) {
+  return (
+    <section className="hero">
+      <div className="container hero-conteudo">
+        <span className="hero-sobretitulo">Fluxo de crédito</span>
+        <h1>Peça seu cartão e acompanhe a análise em tempo real</h1>
+        <p>Cadastro, proposta e emissão de cartões processados por 3 microsserviços que conversam via RabbitMQ.</p>
+        <ol className="hero-passos">
+          {PASSOS_HERO.map(({ nome, rotulo }, i) => (
+            <Fragment key={nome}>
+              {i > 0 && (
+                <li className="hero-seta" aria-hidden>
+                  <IconeSeta />
+                </li>
+              )}
+              <li className={`hero-passo hero-passo-${estados[nome]}`}>
+                <span className="hero-passo-marcador">
+                  {estados[nome] === 'ok' ? <IconeCheck tamanho={14} /> : estados[nome] === 'erro' ? <IconeX tamanho={14} /> : i + 1}
+                </span>
+                {rotulo}
+              </li>
+            </Fragment>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )
+}
+
+function Acompanhamento({ fluxo }: { fluxo?: Fluxo }) {
+  const { cliente, proposta, cartoes, erro } = fluxo ?? {}
+  const estados = fluxo?.estados ?? ESTADOS_INICIAIS
 
   const etapas: Etapa[] = [
     {
@@ -131,10 +168,12 @@ function Resultado({ fluxo }: { fluxo: Fluxo }) {
       servico: 'Clientes API · publica ClienteCadastrado',
       estado: estados.cliente,
       detalhe: cliente && (
-        <>
-          {cliente.nome} · CPF {cliente.cpf}
+        <div className="detalhe-bloco detalhe-coluna">
+          <span className="detalhe-principal">
+            {cliente.nome} · CPF {cliente.cpf}
+          </span>
           <code className="id">{cliente.id}</code>
-        </>
+        </div>
       ),
     },
     {
@@ -142,32 +181,45 @@ function Resultado({ fluxo }: { fluxo: Fluxo }) {
       servico: 'Propostas API · consome ClienteCadastrado, publica PropostaGerada',
       estado: estados.proposta,
       detalhe: proposta && (
-        <>
-          Score <strong>{proposta.score}</strong> ·{' '}
+        <div className="detalhe-bloco">
+          <span className="detalhe-principal">
+            Score <strong className="destaque-azul">{proposta.score}</strong>
+          </span>
           <span className={`selo selo-${proposta.status.toLowerCase()}`}>{proposta.status}</span>
-          {proposta.status === 'Aprovada' && (
-            <>
-              {' '}· {proposta.quantidadeCartoes}× {formatarMoeda(proposta.limitePorCartao)} = {formatarMoeda(proposta.limiteTotal)}
-            </>
+          {proposta.status === 'Aprovada' ? (
+            <span className="detalhe-secundario">
+              {proposta.quantidadeCartoes} × {formatarMoeda(proposta.limitePorCartao)} ={' '}
+              <strong>{formatarMoeda(proposta.limiteTotal)}</strong>
+            </span>
+          ) : (
+            <span className="detalhe-secundario">Score abaixo de 101</span>
           )}
-        </>
+        </div>
       ),
     },
     {
       titulo: 'Emissão de cartões',
       servico: 'Cartões API · consome PropostaGerada',
       estado: estados.cartoes,
-      detalhe: estados.cartoes === 'ignorada' ? 'Proposta negada: nenhum cartão emitido.' : undefined,
+      detalhe:
+        estados.cartoes === 'ignorada' ? (
+          <span className="detalhe-secundario">Proposta negada: nenhum cartão emitido.</span>
+        ) : undefined,
     },
   ]
 
   return (
-    <div className="painel">
+    <section className="painel painel-destaque acompanhamento">
       <div className="painel-cabecalho">
-        <h2>Acompanhamento</h2>
-        <span className="correlacao" title="Enviado no header X-Correlation-Id e propagado pelos eventos">
-          Correlation ID <code>{fluxo.correlationId.slice(0, 8)}</code>
-        </span>
+        <div className="painel-titulo">
+          <h2>Acompanhamento</h2>
+          {!fluxo && <p className="nota">Cadastre um cliente para acompanhar a proposta e a emissão dos cartões em tempo real.</p>}
+        </div>
+        {fluxo && (
+          <span className="correlacao" title="Enviado no header X-Correlation-Id e propagado pelos eventos">
+            Correlation ID <code>{fluxo.correlationId.slice(0, 8)}</code>
+          </span>
+        )}
       </div>
 
       <LinhaDoTempo etapas={etapas} />
@@ -185,14 +237,25 @@ function Resultado({ fluxo }: { fluxo: Fluxo }) {
         </div>
       )}
 
-      {cliente && cartoes && cartoes.length > 0 && (
-        <div className="cartoes">
-          {cartoes.map((cartao, i) => (
-            <CartaoVisual key={cartao.id} cartao={cartao} titular={cliente.nome} indice={i} />
-          ))}
-          <p className="nota">Emitidos em {formatarDataHora(cartoes[0].emitidoEm)}</p>
+      {cliente && proposta && cartoes && cartoes.length > 0 && (
+        <div className="cartoes-emitidos">
+          <div className="cartoes-cabecalho">
+            <div className="painel-titulo">
+              <h3>Cartões emitidos</h3>
+              <span className="nota">Emitidos em {formatarDataHora(cartoes[0].emitidoEm)}</span>
+            </div>
+            <div className="limite-total">
+              <span>Limite total</span>
+              <strong>{formatarMoeda(proposta.limiteTotal)}</strong>
+            </div>
+          </div>
+          <div className="cartoes">
+            {cartoes.map((cartao, i) => (
+              <CartaoVisual key={cartao.id} cartao={cartao} titular={cliente.nome} indice={i} />
+            ))}
+          </div>
         </div>
       )}
-    </div>
+    </section>
   )
 }

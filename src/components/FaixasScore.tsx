@@ -1,39 +1,32 @@
+import { FAIXAS, faixaDoScore } from '../faixas'
 import { formatarMoeda } from '../formatos'
 
-const FAIXAS = [
-  { faixa: '0 – 100', status: 'Negado', cartoes: 0, limite: null },
-  { faixa: '101 – 500', status: 'Aprovado', cartoes: 1, limite: 1_000 },
-  { faixa: '501 – 1000', status: 'Aprovado', cartoes: 2, limite: 5_000 },
-]
-
 export function FaixasScore({ scoreAtual }: { scoreAtual?: number }) {
-  const ativa = (indice: number) =>
-    scoreAtual !== undefined && (indice === 0 ? scoreAtual <= 100 : indice === 1 ? scoreAtual <= 500 && scoreAtual > 100 : scoreAtual > 500)
+  const ativa = scoreAtual !== undefined ? faixaDoScore(scoreAtual) : undefined
 
   return (
-    <div className="painel">
-      <h2>Regras de crédito</h2>
-      <p className="nota">Score = renda mensal ÷ 10, com teto de 1000.</p>
-      <table className="faixas">
-        <thead>
-          <tr>
-            <th>Score</th>
-            <th>Status</th>
-            <th>Cartões</th>
-            <th>Limite/cartão</th>
-          </tr>
-        </thead>
-        <tbody>
-          {FAIXAS.map((f, i) => (
-            <tr key={f.faixa} className={ativa(i) ? 'faixa-ativa' : undefined}>
-              <td>{f.faixa}</td>
-              <td>{f.status}</td>
-              <td>{f.cartoes}</td>
-              <td>{f.limite ? formatarMoeda(f.limite) : '—'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <section className="painel">
+      <div className="painel-cabecalho">
+        <h2 className="titulo-secao">Regras de crédito</h2>
+        <span className="nota">Score = renda mensal ÷ 10, com teto de 1000</span>
+      </div>
+      <ul className="faixas">
+        {FAIXAS.map((f) => {
+          const destacada = f === ativa
+          return (
+            <li key={f.faixa} className={destacada ? 'faixa faixa-ativa' : 'faixa'}>
+              <span className="faixa-rotulo">{destacada ? 'Score · faixa do cliente' : 'Score'}</span>
+              <strong className="faixa-intervalo">{f.faixa}</strong>
+              <span className={`selo ${f.aprovado ? 'selo-aprovada' : 'selo-negada'}`}>
+                {f.aprovado ? 'Aprovado' : 'Negado'}
+              </span>
+              <span className="faixa-descricao">
+                {f.limite ? `${f.cartoes} ${f.cartoes > 1 ? 'cartões' : 'cartão'} de ${formatarMoeda(f.limite)}` : 'Nenhum cartão'}
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
   )
 }
