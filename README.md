@@ -7,6 +7,15 @@ Interface para **cadastrar clientes e acompanhar em tempo real** o fluxo de conc
 | **Produção** | https://parana-credito-web.vercel.app |
 | **Stack** | React 19 · TypeScript · Vite, sem bibliotecas de UI |
 
+## Sumário
+
+- [A solução completa](#a-solução-completa)
+- [O que a tela faz](#o-que-a-tela-faz)
+- [Como executar localmente](#como-executar-localmente)
+  - [Variáveis de ambiente](#variáveis-de-ambiente)
+- [Estrutura](#estrutura)
+- [Build e deploy](#build-e-deploy)
+
 ## A solução completa
 
 | Serviço | Responsabilidade | Repositório |
