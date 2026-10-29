@@ -1,6 +1,6 @@
 # Fluxo de Crédito: front
 
-Interface para **cadastrar clientes e acompanhar em tempo real** o fluxo de concessão de crédito: cadastro → proposta → emissão de cartões, processados por três microsserviços que se comunicam via RabbitMQ.
+Interface para **cadastrar clientes e acompanhar em tempo real** o fluxo de concessão de crédito: cadastro → proposta → emissão de cartões, processados por três microsserviços que se comunicam via RabbitMQ. Uma área de moderação, protegida por login, lista os clientes já cadastrados.
 
 | | |
 |---|---|
@@ -11,6 +11,7 @@ Interface para **cadastrar clientes e acompanhar em tempo real** o fluxo de conc
 
 - [A solução completa](#a-solução-completa)
 - [O que a tela faz](#o-que-a-tela-faz)
+- [Clientes cadastrados](#clientes-cadastrados)
 - [Como executar localmente](#como-executar-localmente)
   - [Variáveis de ambiente](#variáveis-de-ambiente)
 - [Estrutura](#estrutura)
@@ -23,7 +24,7 @@ Interface para **cadastrar clientes e acompanhar em tempo real** o fluxo de conc
 | **Clientes** | Cadastra o cliente e publica `ClienteCadastrado` | [parana-clientes-api](https://github.com/gustavobordig/parana-clientes-api) |
 | **Propostas** | Calcula o score, decide o crédito e publica `PropostaGerada` | [parana-propostas-api](https://github.com/gustavobordig/parana-propostas-api) |
 | **Cartões** | Emite os cartões da proposta aprovada | [parana-cartoes-api](https://github.com/gustavobordig/parana-cartoes-api) |
-| Front | Cadastro e acompanhamento do fluxo | este |
+| Front | Cadastro, acompanhamento do fluxo e listagem de clientes | este |
 
 ![Fluxograma da solução](docs/fluxograma.svg)
 
@@ -38,7 +39,19 @@ Versão editável: [`docs/fluxograma.drawio`](docs/fluxograma.drawio), que abre 
 - **Consulta** de um cliente existente pelo id.
 - **Erros de validação** da API listados na tela, todos de uma vez.
 - **Correlation ID:** cada fluxo gera um id enviado no header `X-Correlation-Id` e mostrado na tela; com ele, a mesma operação é encontrada nos logs dos três serviços.
-- Tema claro e escuro conforme o sistema e layout adaptado ao celular.
+- Identidade visual do Paraná Banco (azul da marca, Montserrat) e layout adaptado a tablet e celular.
+
+## Clientes cadastrados
+
+A aba **Clientes cadastrados** é a área do moderador e **exige login de moderador**. As credenciais não ficam no repositório: são enviadas aos examinadores à parte.
+
+- **Login** em `POST /api/v1/auth/login` da Clientes API, que devolve um token JWT com data de expiração.
+- **Listagem paginada** em `GET /api/v1/clientes`, com o token no header `Authorization: Bearer`. Mostra nome, CPF (já mascarado pela API), e-mail, renda e data do cadastro, do mais recente para o mais antigo, com anterior/próxima, a página atual e o total de clientes.
+- **Acompanhar:** cada linha abre o fluxo daquele cliente na aba principal, com a linha do tempo de proposta e cartões.
+- **Sessão:** o token fica só no `sessionStorage` (some ao fechar a aba), nunca no `localStorage` nem na URL. Antes de cada listagem, a tela compara a expiração com a hora atual; se o token expirou ou a API responde 401, a sessão é apagada e o login volta com o aviso "Sessão expirada". O botão **Sair** apaga o token.
+- **Limite de tentativas:** a API aceita 5 logins por minuto por IP; acima disso a tela mostra "Muitas tentativas. Aguarde 1 minuto.".
+- Usuário e senha não são guardados, e o campo de senha é limpo a cada tentativa.
+- Todas as chamadas continuam enviando o `X-Correlation-Id`.
 
 ## Como executar localmente
 
@@ -70,17 +83,21 @@ As APIs só aceitam chamadas das origens configuradas no CORS delas (`Cors__Orig
 
 ```
 src/
-├── api.ts          Cliente HTTP das três APIs, tratamento de ProblemDetails e polling
+├── api.ts          Cliente HTTP das três APIs, login, ProblemDetails e polling
 ├── types.ts        Contratos das respostas
+├── sessao.ts       Token do moderador no sessionStorage e checagem de expiração
+├── faixas.ts       Faixas de score e regras de crédito
 ├── formatos.ts     Máscara de CPF, moeda, datas e prévia do score
-├── App.tsx         Orquestra o fluxo cadastro → proposta → cartões
-├── styles.css      Tema claro/escuro e layout responsivo
+├── App.tsx         Abas e orquestração do fluxo cadastro → proposta → cartões
+├── styles.css      Identidade visual e layout responsivo
 └── components/
     ├── CadastroForm.tsx
     ├── ConsultaCliente.tsx
+    ├── ClientesCadastrados.tsx   Login do moderador e listagem paginada
     ├── LinhaDoTempo.tsx
     ├── CartaoVisual.tsx
-    └── FaixasScore.tsx
+    ├── FaixasScore.tsx
+    └── Icones.tsx
 ```
 
 ## Build e deploy
