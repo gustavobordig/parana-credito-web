@@ -364,6 +364,26 @@ input::placeholder {
   color: #94a3b8;
 }
 
+/* O Safari do iOS dá ao campo de data uma largura mínima própria e centraliza o texto,
+   fazendo o campo vazar do formulário no celular. */
+input[type='date'] {
+  display: block;
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 48px;
+  line-height: 46px;
+  text-align: left;
+}
+
+input[type='date']::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
 input.mono {
   font-family: var(--mono);
   font-size: 0.875rem;
